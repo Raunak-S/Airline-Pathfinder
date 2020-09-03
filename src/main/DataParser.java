@@ -27,47 +27,67 @@ public class DataParser {
 	 */
     public static void readData(String nodeFile,
     							String edgeFile,
-    							Map<String, String[]> nameToInfo, 
-    							Map<String, String[]> idToInfo,
-    							Set<String[]> edges) 
+    							Map<String, ArrayList<String>> nameToInfo, 
+    							Map<String, ArrayList<String>> idToInfo,
+    							Set<ArrayList<String>> edges) 
     									throws IOException {
 
     	BufferedReader reader = new BufferedReader(new FileReader(nodeFile));
         String line = null;
-        Integer[] ints = {0, 2, 6, 7};
-        HashSet<Integer> indices = new HashSet<>();
-        for (int i = 0; i < ints.length; i++) {
-        	indices.add(ints[i]);
-        }
+        String info = null;
         while ((line = reader.readLine()) != null) {
-        	 String[] building = new String[4];
         	 int index;
-        	 String info;
+        	 ArrayList<String> infoArray = new ArrayList<>();
         	 for (int i = 0; i < 8; i++) {
-        		 if (indices.contains(i)) {
-        			 index = line.indexOf(",");
-            		 info = line.substring(0, index);
-            		 info = info.replaceAll("^\"|\"$", "");
-            		 building[i] = info;
-            		 line = line.substring(index+1, line.length());
+    			 index = line.indexOf(",");
+        		 info = line.substring(0, index);
+        		 info = info.replaceAll("^\"|\"$", "");
+        		 if (i == 0 || i == 2 || i == 6 || i == 7) {
+        			 infoArray.add(info);
         		 }
+        		 line = line.substring(index+1, line.length());        			 
         	 }
-        	 building[3] = line;
-             nameToInfo.put(building[0], building);
-             idToInfo.put(building[1], building);
+             nameToInfo.put(infoArray.get(1), infoArray);
+             idToInfo.put(infoArray.get(0), infoArray);
         }
-
-        
         reader.close();
+        
         reader = new BufferedReader(new FileReader(edgeFile));
         while ((line = reader.readLine()) != null) {
-        	String[] edge = new String[2];
-        	int index = line.indexOf(",");
-        	edge[0] = line.substring(0, index);
-        	edge[1] = line.substring(index+1, line.length());
-        	edges.add(edge);
-        }
+			int index;
+			ArrayList<String> infoArray = new ArrayList<>();
+			for (int i = 0; i < 6; i++) {
+				index = line.indexOf(",");
+				info = line.substring(0, index);
+		   		if (i == 3 || i == 5) {
+		   			infoArray.add(info);
+		   		}
+		   		line = line.substring(index+1, line.length());        			 
+		   	}
+			edges.add(infoArray);
+    	}
         reader.close();
     }
+    
+    public static void prettyPrint(HashMap<String,ArrayList<String>> genMap) {
+    	for (String key : genMap.keySet()) {
+    		System.out.println(key);
+    		for (String info : genMap.get(key)) {
+    			System.out.println("\t" + info);
+    		}
+    	}
+    }
+    
+    public static void main(String[] args) throws IOException {
+    	HashMap<String,ArrayList<String>> idToInfo = new HashMap<>();
+    	HashMap<String,ArrayList<String>> nameToInfo = new HashMap<>();
+    	HashSet<ArrayList<String>> edges = new HashSet<>();
+    	DataParser.readData("data/airports.csv", "data/routes.csv", nameToInfo, idToInfo, edges);
+    	DataParser.prettyPrint(idToInfo);
+    	for (ArrayList<String> edge : edges) {
+    		System.out.println(edge.get(0) + " " + edge.get(1));
+    	}
+    }
+    
 }
 
