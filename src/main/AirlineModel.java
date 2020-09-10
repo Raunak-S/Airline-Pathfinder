@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class AirlineModel {
 
@@ -19,6 +21,10 @@ public class AirlineModel {
 		this.g = new Graph<>();
 		this.idToInfo = new HashMap<>();
 		this.nameToInfo = new HashMap<>();
+	}
+	
+	public Iterator<String> getSortedNodes() {
+		return (new TreeSet<String>(this.nameToInfo.keySet()).iterator());
 	}
 	
 	public void createNewGraph(String nodeFile, String edgeFile) {
@@ -38,7 +44,7 @@ public class AirlineModel {
 		for (ArrayList<String> edge : edges) {
 			String startNode = edge.get(0);
         	String destNode = edge.get(1);
-        	System.out.println(startNode + "  " + destNode);
+        	if (startNode.equals("\\N") || destNode.equals("\\N")) continue;
         	double deltaX = Double.parseDouble(idToInfo.get(startNode).get(2))-Double.parseDouble(idToInfo.get(destNode).get(2));
         	double deltaY = Double.parseDouble(idToInfo.get(startNode).get(3))-Double.parseDouble(idToInfo.get(destNode).get(3));
         	double distance = Math.hypot(deltaX, deltaY);
@@ -99,6 +105,18 @@ public class AirlineModel {
 			finishedNodes.add(minDest);
 		}
 		return null;
+	}
+	
+	public String getIdByName(String name) {
+		return this.nameToInfo.get(name).get(0);
+	}
+	
+	public String getNameById(String id) {
+		return this.idToInfo.get(id).get(1);
+	}
+	
+	public boolean containsNameOrId(String nameOrId) {
+		return this.idToInfo.containsKey(nameOrId) || this.nameToInfo.containsKey(nameOrId);
 	}
 	
 }
